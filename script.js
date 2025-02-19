@@ -1,31 +1,50 @@
-let divs = document.querySelectorAll(".image");
-let count = 1;
-divs.forEach(div=>{
-    div.id = "div" + count;
-    count++;
-    div.addEventListener("dragstart",(e)=>{
-		div.classList.add("selected")
-        e.dataTransfer.setData("text",div.id);
-    })
-});
-let arr = ["dragover","dragenter","drop"];
-let parent = document.querySelector("#parent");
-arr.forEach(event =>{
-    parent.addEventListener(event,(e)=>{
-        e.preventDefault();
-        if(event == "drop"){
-			// console.log(e.target.id)
-			let droppedDiv = document.querySelector("#" + e.target.id);
-			let draggedDiv = document.querySelector("#" + e.dataTransfer.getData("text"));
 
-			let temp = document.createElement("div");
-			droppedDiv.replaceWith(temp);
-			draggedDiv.replaceWith(droppedDiv);
-			temp.replaceWith(draggedDiv);
-			draggedDiv.classList.remove("selected")
-        }
-    })
-})
+let dragindex = 0;
+let dropindex = 0;
+let clone = "";
+
+const images = document.querySelectorAll(".image");
+
+function drag(e) {
+  e.dataTransfer.setData("text", e.target.id);
+}
+
+function allowDrop(e) {
+  e.preventDefault();
+}
+
+function drop(e) {
+  clone = e.target.cloneNode(true);
+  let data = e.dataTransfer.getData("text");
+  let nodelist = document.getElementById("parent").childNodes;
+  console.log(data, e.target.id);
+  for (let i = 0; i < nodelist.length; i++) {
+    if (nodelist[i].id == data) {
+      dragindex = i;
+    }
+  }
+
+  dragdrop(clone);
+
+  document
+    .getElementById("parent")
+    .replaceChild(document.getElementById(data), e.target);
+
+  document
+    .getElementById("parent")
+    .insertBefore(
+      clone,
+      document.getElementById("parent").childNodes[dragindex]
+    );
+}
+
+const dragdrop = (image) => {
+  image.ondragstart = drag;
+  image.ondragover = allowDrop;
+  image.ondrop = drop;
+};
+
+images.forEach(dragdrop);
 
 
 // let arr = ['div1', 'div2', 'div3', 'div4', 'div5', 'div6']
